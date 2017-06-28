@@ -71,6 +71,8 @@ li a {
 }
 
 .category {
+  background-color: #1abc9c;
+  padding: 15px;
   width: 70%;
   overflow: hidden;
   margin-left: 100px;
@@ -94,5 +96,18 @@ li a {
 #myBar {
   width: 1%;
   height: 30px;
-  background-color: #4CAF50;
+  background-color: #bbb;
+}
+
+.title {
+  text-align: left;
+  font-size: 36px;
+  font-family: fantasy;
+  color: white;
+}
+
+p.chkText {
+  margin: 0px;
+  color: white;
+  width: 90%;
 }

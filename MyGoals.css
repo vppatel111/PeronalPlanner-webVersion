@@ -56,3 +56,33 @@ li a {
   padding: 14px 16px;
   text-decoration: none;
 }
+
+.title {
+  font-size: 36px;
+  width: 10%;
+  margin-left: 10px;
+  float: left;
+}
+
+div.goalList {
+  position: relative;
+  right: 1100px;
+  float: right;
+  width: 30%;
+}
+
+p.goalList {
+  background-color: #ccc;
+  padding: 15px;
+  margin-bottom: 0px;
+}
+
+div.goalDisplay {
+  position: relative;
+  margin: 10px;
+  width: 500px;
+  height: 500px;
+  background-color: #bbb;
+  float: right;
+  left: 500px;
+}

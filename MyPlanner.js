@@ -1,7 +1,18 @@
 (function() {
 
   window.onload = function(e) {
-    var i;
+
+    // Uncomment to check local storage browser support
+    // if (typeof(Storage) !== "undefined") {
+    //   console.log("Works");
+    // } else {
+    //   console.log("Local storage not supported.");
+    // }
+
+    //Load in data from local storage.
+    var superData = localStorage.getItem("dataJSON");
+    var loadData = JSON.parse(superData);
+    console.log("Heres the data: " + loadData + superData);
 
     startTime();
     console.log("load");
@@ -37,14 +48,14 @@
     }, 5000);
 
     //Build the day schedule
-    for (var i = -3; i < 11; i++) {
-      var time = now.getHours() + i;
+    for (var i = 1; i <= 24; i++) {
+      var time = now.getHours();
 
       //Make current time box a different color
-      if (i) {
-        var dayElement = $("<button class='accordion'></button>").text(time + ":00");
+      if (i == time) {
+        var dayElement = $("<button class='accordion current'></button>").text(i + ":00");
       } else {
-        var dayElement = $("<button class='accordion current'></button>").text(time + ":00");
+        var dayElement = $("<button class='accordion'></button>").text(i + ":00");
       }
 
       //Create and append the panel and the text for that panel
@@ -81,7 +92,7 @@
       else if (i == day+firstDay-1) //Check if active day, in which case mark it.
       {
         currentDay += 1;
-        var calendarDay = $("<li class='active'></li>").text("");
+        var calendarDay = $("<li class='active " + currentDay + "'></li>").text("");
         calendarDay.append("<span class='active'>" + currentDay + "</span>");
       }
       else if (i >= days+firstDay) //If we already printed all the days put in more blank squares.
@@ -91,7 +102,7 @@
       else
       {
         currentDay += 1;
-        var calendarDay = $("<li></li>").text(currentDay);
+        var calendarDay = $("<li class='" + currentDay + "'></li>").text(currentDay);
       }
 
 
@@ -125,6 +136,31 @@
 
     });
 
+    // //Scroll bar styling
+    // $(document).ready(function () {
+    //       if (!$.browser.webkit) {
+    //         console.log("Not available");
+    //           $('.container').jScrollPane();
+    //       }
+    //       console.log("Is available");
+    //   });
+
+    /* ------------------ Changing days -----------------------------------*/
+
+    $( "ul.days li" ).click(function(){
+      console.log("I cant believe that worked" + this.className);
+
+      //Assign the one element the clicked property
+      if (this.className) {
+
+        //Clear ALL elements
+        $( "ul.days > li" ).removeClass("click");
+
+        //Now style the selected element
+        this.classList.toggle("click");
+      }
+
+    });
     // var AI = function() {};
     // AI.prototype.greet
     // AI.prototype.weather
@@ -132,6 +168,24 @@
     //
     // };
 
+    /* ------------------ Save data in localStorage--------------------------*/
+
+    //Fill up hours array with data from current day.
+    var hours = new Array(24);
+    for (i = 0; i < 24; i++) {
+      hours[i] = $( "div." + i).text();
+    }
+
+    //Convert important data and save it in local storage.
+    var save = new PlannerData(hours);
+    var dataJSON = JSON.stringify(save);
+    localStorage.setItem("dataJSON", dataJSON);
+    console.log(dataJSON);
+
+  };
+
+  var PlannerData = function(hours) {
+    this.hours = hours;
   };
 
   //Begins clock
