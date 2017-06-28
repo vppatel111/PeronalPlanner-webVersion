@@ -57,25 +57,43 @@ li a {
   text-decoration: none;
 }
 
-#todo {
+#donutchart {
+  width: 500px;
+  height: 500px;
+  float: right;
+}
+
+#todo, #progress {
+  background-color: #1abc9c;
   font-size: 36px;
-  width: 49%;
+  padding: 15px;
+  font-family: fantasy;
+  color: white;
+}
+
+#todo {
+  width: 48%;
   margin-left: 10px;
   float: left;
 }
 
 #progress {
-  font-size: 36px;
-  width: 49%;
+  width: 20%;
   float: right;
+}
+
+.todo {
+  float: left;
+  width: 60%;
 }
 
 .category {
   background-color: #1abc9c;
   padding: 15px;
-  width: 70%;
+  width: 100%;
   overflow: hidden;
-  margin-left: 100px;
+  margin-left: 10px;
+  float: left;
 }
 
 .addCategory {

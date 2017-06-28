@@ -34,13 +34,10 @@
       //Bind add button functionality
       $( ".add" ).click(function(){
 
-        //var chkBox = $('<input type="checkbox" name="homwork" value="Math">');
+        //Create and append a text area
         var input = $("<textarea name='plans' rows='1'" +
                      "cols='30' id='pls' class='scheduleText'></textarea><br>").text("Example");
-
-        var endOfList = this.parentElement.lastElementChild;
-        //endOfList.after(chkBox);
-        input.insertBefore(endOfList);
+        input.insertBefore(this);
 
         //Convert to a checkbox when the user presses enter.
         $( ".scheduleText" ).bind("keypress", function(e) {

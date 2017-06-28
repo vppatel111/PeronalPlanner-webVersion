@@ -11,6 +11,34 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="MyTodo.js"></script>
 
+  <!-- Google charts API - Donut Chart -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Task', 'Hours per Day'],
+          ['Work',     11],
+          ['Eat',      2],
+          ['Commute',  2],
+          ['Watch TV', 2],
+          ['Sleep',    7]
+        ]);
+
+        var options = {
+          title: 'My Daily Activities',
+          backgroundColor: '#1abc9c',
+          width: 500,
+          pieHole: 0.4,
+          padding: 0,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+      }
+  </script>
+
   <meta charset="UTF-8">
   <meta name="description" content="Planner">
   <meta name="keywords" content="HTML,CSS,XML,JavaScript">
@@ -41,27 +69,29 @@
   <p id="todo">TODO</p>
   <p id="progress">NET PROGRESS</p>
 
-  <div class="category">
-    <!-- <p class="title">Homework</p>
+  <!-- These elements need to stick together -->
+  <div class="todo">
+    <div class="category">
+      <!-- <p class="title">Homework</p>
 
-      <div id="myProgress">
-        <div id="myBar"></div>
-      </div>
+        <div id="myProgress">
+          <div id="myBar"></div>
+        </div>
 
-      <form>
-        <input type="checkbox" name="homwork" value="Math">I have a bike<br>
-        <input type="checkbox" name="homework2" value="Science">Not bike<br>
-      </form>
+        <form>
+          <input type="checkbox" name="homwork" value="Math">I have a bike<br>
+          <input type="checkbox" name="homework2" value="Science">Not bike<br>
+        </form>
 
-      <button class="add">Add</button> -->
-    <!-- List of check boxes
-    Add button
-    Progress bar -->
+        <button class="add">Add</button> -->
+      <!-- List of check boxes
+      Add button
+      Progress bar -->
+    </div>
+    <button class="addCategory">Add Category</button>
   </div>
 
-  <button class="addCategory">Add Category</button>
-
-  <div class="pichart"></div>
+  <div id="donutchart"></div>
 
 </div>
 </body>
