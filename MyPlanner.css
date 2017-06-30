@@ -167,6 +167,10 @@ div.panel {
   overflow: hidden;
 }
 
+#weather {
+  margin-left: 6px;
+}
+
 .month {
   padding: 70px 25px;
   width: 100%;
@@ -249,10 +253,10 @@ div.panel {
 
 .clock {
   position: fixed;
-  top: 15%;
+  top: 6.5%;
   left: 74%;
   width: 25%;
-  height: 80%;
+  height: 87%;
   float: right;
   background: #1abc9c;
 }
@@ -263,4 +267,37 @@ div.panel {
   font-family: fantasy;
   color: white;
   background: #1abc9c;
+}
+
+#chat {
+  width: 100%;
+  list-style-type: none;
+  padding: 10px;
+}
+
+.msgContainer {
+  width: 100%;
+}
+
+.msg {
+  float: left;
+  width: 100%;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.msg::after {
+  width: 0;
+  height: 0;
+  content: "";
+  top: -5px;
+  left: 14px;
+  position: relative;
+  border-style: solid;
+  border-width: 13px 13px 0 0;
+  border-color: whitesmoke transparent transparent transparent;
+}
+
+.text {
+  width: 100%;
 }
