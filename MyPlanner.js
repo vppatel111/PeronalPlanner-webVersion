@@ -10,9 +10,16 @@
     // }
 
     //Load in data from local storage.
-    var superData = localStorage.getItem("dataJSON");
-    var loadData = JSON.parse(superData);
-    console.log("Heres the data: " + loadData + superData);
+    var plannerData = new PlannerData();
+    var ai = new AI;
+
+    //Only load when everything is done.
+    // var savedData = localStorage.getItem("dataJSON");
+    // var loadData = JSON.parse(savedData);
+    //
+    // plannerData = savedData;
+
+    //console.log("Heres the data: " + loadData + plannerData);
 
     startTime();
     console.log("load");
@@ -20,24 +27,6 @@
     var now = new Date();
     var day = now.getDate();
     console.log(day + " " + now);
-
-    var morning = 12;
-    var afternoon = 18;
-    var evening = 24;
-
-    //Set welcome text
-    if (now.getHours() < morning)
-    {
-      $( "#welcome" ).text("Good morning.");
-    }
-    else if (now.getHours() < afternoon)
-    {
-      $( "#welcome" ).text("Good afternoon!");
-    }
-    else if (now.getHours() < evening)
-    {
-      $( "#welcome" ).text("Good evening.");
-    }
 
     // Display welcome message
     $( "#welcome" ).animate({opacity: '1'});
@@ -78,12 +67,23 @@
 
     var days = daysInMonth(now.getMonth(), now.getFullYear());
     var firstDay = new Date(now.getFullYear(), now.getMonth()).getDay();
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November",
+                      "December"];
+
     console.log(now.getMonth() + " " + now.getFullYear() + " " + firstDay);
 
+    //Build and print the month title
+    var title = $("<ul class='month'></ul>");
+    var titleText = $("<li>" + monthNames[now.getMonth()] + "</li>")
+    title.append(titleText);
 
-    //Print the calendar
+    var calendar = $("#calendar")
+    calendar.prepend(title);
+
+    //Build and print the days
     var currentDay = 0; //Day counter
-    for (var i = 1; i <= 35; i++) {
+    for (var i = 1; i <= 42; i++) {
 
       if (i < firstDay) // Prints blank squares until it reaches the first day
       {
@@ -148,7 +148,6 @@
     /* ------------------ Changing days -----------------------------------*/
 
     $( "ul.days li" ).click(function(){
-      console.log("I cant believe that worked" + this.className);
 
       //Assign the one element the clicked property
       if (this.className) {
@@ -161,31 +160,119 @@
       }
 
     });
-    // var AI = function() {};
-    // AI.prototype.greet
-    // AI.prototype.weather
-    // AI.prototype.speak = function () {
-    //
-    // };
 
     /* ------------------ Save data in localStorage--------------------------*/
 
-    //Fill up hours array with data from current day.
-    var hours = new Array(24);
-    for (i = 0; i < 24; i++) {
-      hours[i] = $( "div." + i).text();
-    }
+    // var superArray = [][];
+    // superArray[0][0] = "hi";
+    // console.log(superArray[0][0]);
 
-    //Convert important data and save it in local storage.
-    var save = new PlannerData(hours);
-    var dataJSON = JSON.stringify(save);
+    //Fill up months array with the days of the month
+
+
+
+    //Convert important data and save it in local storage
+    var dataJSON = JSON.stringify(plannerData);
+
+    plannerData.saveDayData(1, 3);
+    plannerData.saveDayData(now.getMonth(), now.getDay());
     localStorage.setItem("dataJSON", dataJSON);
-    console.log(dataJSON);
+    console.log(plannerData);
+
+    ai.greet();
+
+  }; //Heres where the onload function ends
+
+  var AI = function() {
+
+    //Initialize AI time.
+    var now = new Date();
+    AI.time = now.getHours();
+
+    //AI.prototype.greet
+    //AI.prototype.weather
+    //AI.prototype.speak = function () {
 
   };
 
-  var PlannerData = function(hours) {
-    this.hours = hours;
+  AI.prototype.greet = function () {
+
+    var now = new Date();
+
+    var morning = 12;
+    var afternoon = 18;
+    var evening = 24;
+
+    //Set welcome text
+    if (now.getHours() < morning)
+    {
+      this.chat("Good morning.");
+    }
+    else if (now.getHours() < afternoon)
+    {
+      this.chat("Good afternoon!");
+    }
+    else if (now.getHours() < evening)
+    {
+      this.chat("Good evening.");
+    }
+
+  };
+
+  AI.prototype.chat = function(message) {
+
+    var msgContainer = $('<li class="msgContainer"></li>');
+    var msg = $('<div class="msg"></div>');
+    var msgText = $('<div class="text"><p>' + message + '</p></div>');
+    var chat = $("#chat");
+
+    msg.append(msgText);
+    msgContainer.append(msg);
+    chat.append(msgContainer);
+
+    $( ".msgContainer" ).animate({opacity: '1',
+                                  width: '100%'}, "slow");
+
+  };
+
+  var PlannerData = function(month) {
+
+    //Use cookie to check for first time array creation.
+
+    //Create a 3D array for an entire year if one does not already exist.
+    var month = new Array(12);
+    for (i = 0; i < 12; i++) {
+
+      month[i] = new Array(31);
+      for (j = 0; j < 31; j++) {
+
+        month[i][j] = new Array(24);
+        for (k = 0; k < 24; k++) {
+          month[i][j][k] = "D";
+        }
+      }
+    }
+
+    this.month = month; //month = [month][day][hour]
+
+  };
+
+  PlannerData.prototype.saveDayData = function(month, day) {
+    this.month[month][day] = this.getDayData();
+  };
+
+  //Fills up and returns an array with data from current day
+  PlannerData.prototype.getDayData = function() {
+
+    var hours = new Array(24);
+    for (i = 0; i < 24; i++) {
+      hours[i] = $( "div." + (i + 1)).text();
+    }
+    return hours;
+  };
+
+  PlannerData.prototype.setDayData = function() {
+
   };
 
   //Begins clock
