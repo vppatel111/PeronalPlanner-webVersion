@@ -1,5 +1,11 @@
 (function() {
 
+
+  /* IDEA: (s) List
+    - Reminders for events as they approach
+    - Formatting on month calendar for small months
+    - Highlighting of days that have tasks to do
+  */
   window.onload = function(e) {
 
     // Uncomment to check local storage browser support
@@ -14,15 +20,14 @@
     var ai = new AI;
 
     //Only load when everything is done.
-    // var savedData = localStorage.getItem("dataJSON");
-    // var loadData = JSON.parse(savedData);
-    //
-    // plannerData = savedData;
+    var savedData = localStorage.getItem("dataJSON");
+    var loadData = JSON.parse(savedData);
 
-    //console.log("Heres the data: " + loadData + plannerData);
+    //plannerData.month = savedData;
+    //console.log("Heres the loaded data: ");
+    //console.log(loadData);
 
     startTime();
-    console.log("load");
 
     var now = new Date();
     var day = now.getDate();
@@ -42,13 +47,13 @@
 
       //Make current time box a different color
       if (i == time) {
-        var dayElement = $("<button class='accordion current'></button>").text(i + ":00");
+        var dayElement = $("<button class='accordion current'></button>").text(getFormattedTime(i));
       } else {
-        var dayElement = $("<button class='accordion'></button>").text(i + ":00");
+        var dayElement = $("<button class='accordion'></button>").text(getFormattedTime(i));
       }
 
       //Create and append the panel and the text for that panel
-      var panel = $("<div class='panel " + i + "'></div>");
+      var panel = $("<div class='panel p" + i + "'></div>");
       var para = $("<textarea name='plans' rows='2'" +
                    "cols='30' class='scheduleText'></textarea>").text(i);
       var add = $("<button class='add' id=" + i + "></button>").text("");
@@ -106,7 +111,7 @@
       }
 
 
-      $(".days").append(calendarDay);
+      $( ".days" ).append(calendarDay);
     }
 
     //Methods to handle callback should be declared after the element is
@@ -124,16 +129,29 @@
 
     });
 
+    //BUG: Button needs to move down as well.
     $( ".add" ).click(function(){
 
       var para = $("<textarea name='plans' rows='2'" +
                    "cols='30' class='scheduleText'></textarea>").text("hi");
-      $("." + this.id).append(para)
+      $(".p" + this.id).append(para)
 
       // Extend panel further to accomodate entry
       var panel = this.parentElement;
       panel.style.maxHeight = panel.scrollHeight + "px";
 
+    });
+
+    /* Settings button clicked */
+    $( "#settings" ).click(function(){
+      $( "#overlay" ).fadeIn(400);
+      $( "#settingsContainer" ).fadeIn(400);
+      plannerData.saveDayData(now.getMonth(), now.getDay());
+    });
+
+    $( "#overlay" ).click(function() {
+      $( "#overlay" ).fadeOut(400);
+      $( "#settingsContainer" ).fadeOut(400);
     });
 
     // //Scroll bar styling
@@ -157,6 +175,9 @@
 
         //Now style the selected element
         this.classList.toggle("click");
+
+        console.log("ID: ~" + this.classList[0]);
+        plannerData.loadDayData(now.getMonth(), this.classList[0]);
       }
 
     });
@@ -170,14 +191,19 @@
     //Fill up months array with the days of the month
 
 
+    /* NOTE: Unfortunately it seems that we cannot conver stuff to JSON and
+    expect to save object methods or types therefore we are going to instead
+    just store the necessary information and load it up when needed. */
+
+    console.log(plannerData);
 
     //Convert important data and save it in local storage
-    var dataJSON = JSON.stringify(plannerData);
+    var dataJSON = JSON.stringify(plannerData.month);
 
-    plannerData.saveDayData(1, 3);
-    plannerData.saveDayData(now.getMonth(), now.getDay());
+    // localStorage.Clear(); //Dump local storage
     localStorage.setItem("dataJSON", dataJSON);
-    console.log(plannerData);
+    console.log(plannerData.month);
+
 
     ai.greet();
 
@@ -189,36 +215,56 @@
     var now = new Date();
     AI.time = now.getHours();
 
+    AI.wakeUpTime = 12;
+    AI.sleepTime = 0;
+    AI.asleep = this.updateStatus(now);
+
     //AI.prototype.greet
     //AI.prototype.weather
     //AI.prototype.speak = function () {
 
   };
 
+  AI.prototype.updateStatus = function (now) {
+
+    var time = now.getHours();
+    if ( (time >= 0) && (time <= 12) ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   AI.prototype.greet = function () {
 
-    var now = new Date();
+    if (AI.asleep) {
+        this.chat("...zzz...");
+    } else {
+      var time = (new Date()).getHours();
 
-    var morning = 12;
-    var afternoon = 18;
-    var evening = 24;
+      var morning = 12;
+      var afternoon = 18;
+      var evening = 24;
 
-    //Set welcome text
-    if (now.getHours() < morning)
-    {
-      this.chat("Good morning.");
-    }
-    else if (now.getHours() < afternoon)
-    {
-      this.chat("Good afternoon!");
-    }
-    else if (now.getHours() < evening)
-    {
-      this.chat("Good evening.");
+      //Set welcome text
+      if (time < morning)
+      {
+        this.chat("Good morning.");
+      }
+      else if (time < afternoon)
+      {
+        this.chat("Good afternoon!");
+        this.chat("How are you doing?");
+      }
+      else if (time < evening)
+      {
+        this.chat("Good evening.");
+      }
     }
 
   };
 
+  //Build and display a message
   AI.prototype.chat = function(message) {
 
     var msgContainer = $('<li class="msgContainer"></li>');
@@ -253,11 +299,14 @@
       }
     }
 
-    this.month = month; //month = [month][day][hour]
+    this.month = month; //month = [month][day][hour][data]
 
   };
 
+  // IDEA: Switch to a dynamic tree structure later when storage gets massive
+  // for easy storage and sorting.
   PlannerData.prototype.saveDayData = function(month, day) {
+    console.log("Month " + this.month);
     this.month[month][day] = this.getDayData();
   };
 
@@ -265,13 +314,52 @@
   PlannerData.prototype.getDayData = function() {
 
     var hours = new Array(24);
-    for (i = 0; i < 24; i++) {
-      hours[i] = $( "div." + (i + 1)).text();
+    for (i = 0; i < 23; i++) {
+
+      //Create array of entries for each hour.
+      var hourData = new Array();
+      var enteredText = $( "div.p" + (i + 1)).children("textarea");
+      for(j = 0; j < enteredText.length; j++) {
+        hourData.push($(enteredText[j]).val());
+      }
+
+      hours[i] = hourData;
+
     }
+
+    console.log(hours);
     return hours;
   };
 
-  PlannerData.prototype.setDayData = function() {
+  PlannerData.prototype.loadDayData = function(month, day) {
+
+    //Append on new data
+    //console.log(" THE TEST " + month + " " + day);
+    var data = this.month[month][day];
+
+    if (typeof data == 'undefined') { // Do nothing if data is present
+      console.log("Nothing loaded");
+    } else { // Otherwise load and append
+
+      for (i = 0; i < 23; i++) {
+
+        var hourData = data[i];
+        var timeslot = $( "div.p" + (i + 1));
+
+        //Clear the existing children first
+        timeslot.find("textarea").remove();
+
+        //Load in the data for that column
+        for (j = 0; j < hourData.length; j++) {
+          var plan = $("<textarea name='plans' rows='2' cols='30'" +
+                       " class='scheduleText'></textarea>").text(hourData[j]);
+          timeslot.prepend(plan);
+        }
+      }
+
+      console.log("Loading Successful" + month + " " + day);
+
+    }
 
   };
 
@@ -300,6 +388,28 @@
       i = "0" + i;
     }
     return i;
+  }
+
+  //Takes a 24 hour time and returns a formatted time.
+  function getFormattedTime(i) {
+
+    // Simply returns i:00 if 24 hour time
+    if (false) {
+      return i + ":00";
+    } else {
+
+      //Otherwise format the time
+      if (i < 12) {
+        return i +":00 AM";
+      } else if (i == 12) {
+        return "12:00 PM";
+      } else if (i == 24) {
+        return "12:00 AM";
+      } else {
+        return (i - 12) + ":00 PM";
+      }
+
+    }
   }
 
 })();

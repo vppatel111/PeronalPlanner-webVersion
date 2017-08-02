@@ -9,6 +9,8 @@
           // a label
     //move();
 
+    var todoData = new TodoData();
+
     $( ".addCategory" ).click(function(){
 
       console.log("Running");
@@ -19,7 +21,7 @@
       var row = $('<tr></tr>');
 
       var title = $('<p class="title">Homework</p>');
-      var prgBar = $('<div id="myProgress"><div id="myBar"></div></div>');
+      var prgBar = $('<div id="myProgress"><div class="myBar" id="myBar' + i + '"></div></div>');
       var form = $('<form id="chkList"></form>');
 
       //Note: The text is wrapped in paragraph elements for easy styling.
@@ -40,6 +42,20 @@
       div.append(button);
 
       panel.prepend(div);
+
+      todoData.add();
+
+      $( ":checkbox" ).unbind().click(function() {
+        if (this.checked) {
+
+          //Replace 0 with ID
+          todoData.todoList[0].completedTasks += 1;
+          console.log("Riding cowboy " + todoData.todoList[0].completedTasks);
+          move(1, todoData.todoList[0].completedTasks);
+
+          $(this).attr("disabled", true);
+        }
+      });
 
       //Bind add button functionality
       $( ".add.button" + i ).click(function(){
@@ -83,6 +99,20 @@
             br.remove();
             //para.remove();
 
+            $( ":checkbox" ).unbind().click(function() {
+              if (this.checked) {
+
+                //Replace 0 with ID
+                todoData.todoList[0].completedTasks += 1;
+
+                var progID = $(this).parents("#chkList").siblings("#myProgress").children().attr("id");
+                console.log(progID);
+                move(1, todoData.todoList[progID.slice(-1)].completedTasks, progID);
+
+                $(this).attr("disabled", true);
+              }
+            });
+
           }
         });
 
@@ -90,16 +120,28 @@
       i += 1; //Increment the counter
     });
 
+  }; //End of onload()
 
-
+  var TodoData = function() {
+    var todoList = new Array();
+    this.todoList = todoList;
   };
 
-  function move() {
-    var elem = document.getElementById("myBar");
-    var width = 1;
+  TodoData.prototype.add = function () {
+    this.todoList.push(new TodoCategory("Homework", 3));
+  };
+
+  var TodoCategory = function(name, numTasks) {
+    this.name = name;
+    this.numTasks = numTasks;
+    this.completedTasks = 0;
+  };
+
+  function move(width, value, progID) {
+    var elem = document.getElementById(progID);
     var id = setInterval(frame, 10);
     function frame() {
-      if (width >= 100) {
+      if (width >= value) {
         clearInterval(id);
       } else {
         width++;
